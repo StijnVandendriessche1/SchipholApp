@@ -21,6 +21,7 @@ namespace SchipholUserAPI
         {
             try
             {
+                bool isUnique;
                 string constr = Environment.GetEnvironmentVariable("CONNECTIONSTRING");
                 string json = await new StreamReader(req.Body).ReadToEndAsync();
                 User reg = JsonConvert.DeserializeObject<User>(json);
@@ -32,16 +33,37 @@ namespace SchipholUserAPI
                     using (SqlCommand cmd = new SqlCommand())
                     {
                         cmd.Connection = con;
-                        cmd.CommandText = "insert into tblUser values (@UserId, @FName, @Name, @Email, @Password)";
-                        cmd.Parameters.AddWithValue("@UserId", reg.UserId);
-                        cmd.Parameters.AddWithValue("@FName", reg.Fname);
-                        cmd.Parameters.AddWithValue("@Name", reg.Name);
-                        cmd.Parameters.AddWithValue("@Email", reg.Email);
-                        cmd.Parameters.AddWithValue("@Password", reg.PasswordHash);
-                        await cmd.ExecuteNonQueryAsync();
+
+                        cmd.CommandText = "select * from tblUser where Email = @email";
+                        cmd.Parameters.AddWithValue("@email", reg.Email);
+                        SqlDataReader reader = await cmd.ExecuteReaderAsync();
+                        if (reader.HasRows)
+                        {
+                            isUnique = false;
+                        }
+                        else
+                        {
+                            using(SqlConnection co = new SqlConnection())
+                            {
+                                co.ConnectionString = constr;
+                                await co.OpenAsync();
+                                using (SqlCommand c = new SqlCommand())
+                                {
+                                    c.Connection = co;
+                                    c.CommandText = "insert into tblUser values (@UserId, @FName, @Name, @Email, @Password)";
+                                    c.Parameters.AddWithValue("@UserId", reg.UserId);
+                                    c.Parameters.AddWithValue("@FName", reg.Fname);
+                                    c.Parameters.AddWithValue("@Name", reg.Name);
+                                    c.Parameters.AddWithValue("@Email", reg.Email);
+                                    c.Parameters.AddWithValue("@Password", reg.PasswordHash);
+                                    await c.ExecuteNonQueryAsync();
+                                    isUnique = true;
+                                }
+                            }
+                        }
                     }
                 }
-                return new OkObjectResult("");
+                return new OkObjectResult(isUnique);
             }
             catch (Exception ex)
             {
