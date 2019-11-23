@@ -70,7 +70,14 @@ namespace SchipholUserAPI
                         }
                     }
                 }
-                return new OkObjectResult(succes);
+                if(succes)
+                {
+                    return new OkObjectResult(u.UserId);
+                }
+                else
+                {
+                    return new OkObjectResult("FAIL");
+                }
             }
             catch(Exception ex)
             {
