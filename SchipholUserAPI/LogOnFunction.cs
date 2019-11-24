@@ -40,15 +40,7 @@ namespace SchipholUserAPI
                         if(reader.HasRows)
                         {
                             while(reader.Read())
-                            {
-                                //Registration r = new Registration();
-                                //r.RegistrationId = reader["RegistrationId"].ToString();
-                                //r.LastName = reader["LastName"].ToString();
-                                //r.FirstName = reader["FirstName"].ToString();
-                                //r.Email = reader["Email"].ToString();
-                                //r.ZipCode = reader["Zipcode"].ToString();
-                                //r.Age = Convert.ToInt32(reader["Age"]);
-                                //r.IsFirstTimer = Convert.ToBoolean(reader["isFirstTimer"]);
+                            { 
                                 u.UserId = reader["UserId"].ToString();
                                 u.Fname = reader["FName"].ToString();
                                 u.Name = reader["Name"].ToString();
